@@ -5,6 +5,7 @@ pipeline {
         DOCKER_IMAGE = 'yash11526512/node-app:latest'
     }
 
+    stages {
         stage('Build Docker Image') {
             steps {
                 script {
