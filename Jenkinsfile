@@ -6,16 +6,10 @@ pipeline {
     }
 
     stages {
-        stage('Clone Repo') {
-            steps {
-                git 'https://github.com/Yash-Khandal/Iac_Test.git'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE}", ".") // build from current directory
+                    docker.build("${DOCKER_IMAGE}", ".")
                 }
             }
         }
