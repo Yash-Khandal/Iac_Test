@@ -2,32 +2,46 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'yash11526512/node-app:latest'
+        // Use a dynamic tag (BUILD_ID is available by default in Jenkins)
+        DOCKER_IMAGE = 'yash11526512/node-app'
     }
 
     stages {
         stage('Clone Repo') {
             steps {
-                git 'https://github.com/Yash-Khandal/Iac_Test.git'
+                git branch: 'main', 
+                url: 'https://github.com/Yash-Khandal/Iac_Test.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE}")
+                    // Explicitly specify the directory containing Dockerfile
+                    docker.build("${DOCKER_IMAGE}:${env.BUILD_ID}", "./node-app")
                 }
             }
         }
 
         stage('Push to Docker Hub') {
             steps {
-                withDockerRegistry([ credentialsId: 'docker-hub-creds', url: '' ]) {
+                withDockerRegistry([credentialsId: 'docker-hub-creds', url: 'https://registry.hub.docker.com']) {
                     script {
-                        docker.image("${DOCKER_IMAGE}").push()
+                        // Push both the build-specific tag and latest
+                        docker.image("${DOCKER_IMAGE}:${env.BUILD_ID}").push()
+                        docker.image("${DOCKER_IMAGE}:${env.BUILD_ID}").push('latest')
                     }
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Successfully pushed ${DOCKER_IMAGE}:${env.BUILD_ID} to Docker Hub"
+        }
+        failure {
+            echo "Pipeline failed - check the logs for errors"
         }
     }
 }
