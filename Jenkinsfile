@@ -5,13 +5,6 @@ pipeline {
         DOCKER_IMAGE = 'yash11526512/node-app:latest'
     }
 
-    stages {
-        stage('Clone Repo') {
-            steps {
-                git 'https://github.com/Yash-Khandal/Iac_Test.git'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
