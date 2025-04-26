@@ -9,26 +9,16 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE}")
+                    docker.build(DOCKER_IMAGE)
                 }
             }
         }
-
         stage('Push to Docker Hub') {
             steps {
-                withDockerRegistry([ credentialsId: 'docker-hub-creds', url: '' ]) {
+                withDockerRegistry([credentialsId: 'docker-hub-creds', url: 'https://index.docker.io/v1/']) {
                     script {
-                        docker.image("${DOCKER_IMAGE}").push()
+                        docker.image(DOCKER_IMAGE).push()
                     }
-                }
-            }
-        }
-
-        stage('Deploy to Kubernetes') {
-            steps {
-                script {
-                    sh 'kubectl apply -f deployment.yaml'
-                    sh 'kubectl apply -f service.yaml'
                 }
             }
         }
