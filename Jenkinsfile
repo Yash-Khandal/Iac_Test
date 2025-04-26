@@ -6,10 +6,16 @@ pipeline {
     }
 
     stages {
+        stage('Clone Repo') {
+            steps {
+                git 'https://github.com/Yash-Khandal/Iac_Test.git'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE}", ".")
+                    docker.build("${DOCKER_IMAGE}")
                 }
             }
         }
@@ -20,6 +26,15 @@ pipeline {
                     script {
                         docker.image("${DOCKER_IMAGE}").push()
                     }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    sh 'kubectl apply -f deployment.yaml'
+                    sh 'kubectl apply -f service.yaml'
                 }
             }
         }
